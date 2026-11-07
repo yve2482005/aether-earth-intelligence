@@ -1,0 +1,75 @@
+AETHER Earth Intelligence — BACKEND verification log
+=====================================================
+Run date (UTC): 2026-10-05 ~16:15-16:18
+Runner: backend workstream lead (subagent)
+Python: venv ~/workspace/.tooling/aether-venv (requests, fastapi 0.142.2, uvicorn)
+
+1. SETUP
+- pip install requests fastapi uvicorn: OK (venv, system python is PEP-668 locked)
+- scripts/init_db.py: OK -> data/aether.db created, 17 tables (schema.sql source of truth)
+- scripts/seed_registry.py: OK -> 9 source_registry rows
+  (open-meteo-forecast, open-meteo-air-quality, usgs-earthquake-all-hour,
+   usgs-earthquake-significant-month, nws-tsunami-cap, satellite-imagery,
+   radar-imagery, regional-seismic-networks, tsunami-sea-level)
+- compileall over backend/ + scripts/: OK, no syntax errors
+
+2. LIVE COLLECT (scripts/run_collect.py, Yangon 16.84/96.17) — run #1
+- openmeteo.collect: 4/4 models OK (HTTP 200 each)
+    gfs_seamless=168 rows, icon_seamless=168, ecmwf_ifs=168, jma_seamless=168
+    (7-day hourly: 2026-10-05T00:00Z .. 2026-10-11T23:00Z). Duplicates ignored on re-run.
+- open-meteo air quality (CAMS): OK, AQI attached to all 672 rows (max US AQI 153)
+- weather observations (open-meteo-nowcast): OK, 1 row
+    2026-10-05T16:15Z: 25.1C, 98% RH, 1012.3 hPa, 1.05 m/s, quality=nowcast_model_estimate
+- usgs all_hour + significant_month: OK (HTTP 200 both feeds)
+    20 earthquake_events inserted; largest M6.6 mww New Caledonia (us6000txpi, 2026-09-25)
+    1 event with tsunami_flag=1 (M6.5 Alaska us7000ti1p)
+- earthquake_updates: 20 revision rows (append-only provenance; +20 on re-run = correct)
+- aftershock check (1 ComCat detail fetch, largest event us6000txpi M6.6):
+    product_types seen: dyfi, ground-failure, internal-moment-tensor, losspager,
+    moment-tensor, origin, phase-data, shakemap -> no 'aftershock-forecast' product
+    => honest "No official aftershock forecast available for this event."
+- NWS CAP atom (https://alerts.weather.gov/cap/us.php?x=0): FAILED honestly
+    ProxyError (sandbox egress blocked alerts.weather.gov), recorded as down in
+    system_health + source_registry health=down. No messages fabricated.
+    Terms remain "verify terms" per registry notes.
+- satellite / radar / regional_networks / tsunami-sea-level: honest unavailable stubs
+    (health=not_configured, 0 rows, messages logged)
+- alert_engine.build_alerts: 0 alerts issued (correct: no active official tsunami
+    messages; no M>=6.0 quake within last 48h), 0 expired marked
+
+3. FINAL ROW COUNTS (data/aether.db)
+- weather_forecasts: 672 | weather_observations: 1
+- earthquake_events: 20 | earthquake_updates: 40 (two collect runs)
+- tsunami_events: 0 | tsunami_messages: 0
+- earth_events: 0 | alerts: 0 | locations: 2 (1 ours: Yangon; 1 from another agent's probe)
+- system_health: 28 rows (14 per run) | source_registry: 9
+
+4. API SMOKE (uvicorn 127.0.0.1:8000, all HTTP 200)
+- /health -> 200 {"status":"ok"}
+- /v1/health -> 14 components, 9 ok, 9 sources
+- /v1/earthquakes?min_magnitude=6 -> count=4, kind=DETECTION, provenance age 0.7 min
+- /v1/earthquakes/us6000txpi -> event + revisions
+- /v1/weather/current?lat=16.84&lon=96.17 -> forecast_now (GFS) + observation, confidence 'why' list
+- /v1/weather/hourly (3h), /v1/weather/daily (2d) -> OK
+- /v1/weather/map -> honest unavailable (no tiles wired)
+- /v1/tsunami -> no_active_messages (honest)
+- /v1/tsunami/risk/coastal?lat=16.84&lon=96.17 -> LOW, kind=RISK, disclaimer present
+- /v1/alerts -> count=0 | /v1/events -> count=0
+- /v1/accuracy -> no_verification_data (honest) | /v1/models -> no_models (honest)
+- /v1/locations -> 2 | /status -> table counts | /metrics -> Prometheus text OK
+
+5. HONESTY SCANS
+- grep for "100% accurate"/"guaranteed"/"will occur"/prediction claims: clean
+  (only occurrences are comments explicitly prohibiting such claims)
+- Every user-visible payload carries provenance {sources, updated_at, data_age_min}
+  and kind tags FORECAST|DETECTION|OBSERVATION|WARNING|RISK.
+- No secrets in code; env vars AETHER_* only. No phone files touched.
+- Zero spend: stdlib + requests + fastapi + uvicorn only.
+
+6. BLOCKED / NOT VERIFIED
+- NWS tsunami CAP: unreachable from sandbox (proxy refused) — recorded honestly;
+  needs a live check from an environment with direct egress, and terms review.
+- Satellite/radar/sea-level/regional networks: unwired by design (honest stubs).
+- earth_events table: empty (no event synthesis builder wired yet — alert engine
+  covers alerts; earth_events population is a follow-up).
+- Android/tunnel verification: not in backend scope.
