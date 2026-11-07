@@ -1,0 +1,43 @@
+AETHER Earth Intelligence — test verification record
+Workstream: Integration + Docs + Tests
+Generated: 2026-10-05 (evening, +0630) — pytest run on this host
+Command: python -m pytest tests/ -q
+Python 3.12.3, pytest 9.1.1, FastAPI 0.142.2 (installed), httpx installed.
+
+RESULT: 88 passed, 5 failed, 0 skipped (93 total)
+
+Per-file (this workstream):
+  tests/test_sheets.py:       10 passed   (SheetMirror env-gating, tabs, push, lazy import — mocked)
+  tests/test_drive.py:        11 passed   (DriveArchive env-gating, folder tree, upload — mocked)
+  tests/test_api_contract.py: 21 passed   (all 15 contract routes 200 via TestClient; provenance + kind tags)
+  tests/test_alerts.py:        7 passed   (priority ladder vs real engine on in-memory DB; dedup idempotent)
+  tests/test_dedup.py:         5 passed, 5 FAILED (see below)
+  tests/test_security.py:       3 passed   (no secret patterns in repo; creds only from env)
+  tests/test_honesty.py:        3 passed   (no banned certainty phrases outside ban statements; 6 labels in docs)
+
+Per-file (ML team, not this workstream — included in the same run):
+  tests/test_ml_honesty.py:    3 passed
+  tests/test_ml_leakage.py:    9 passed
+  tests/test_ml_registry.py:   7 passed
+  tests/test_ml_timeseries.py: 9 passed
+
+KNOWN FAILURES (real, not masked — backend team owns the fix):
+  tests/test_dedup.py 5 failures — backend/collectors/earthquake/event_deduplicator.py,
+  function find_merge_candidate(), executes
+      "SELECT ... FROM earthquake_events WHERE source != ?"
+  without binding the `source` parameter -> sqlite3.ProgrammingError
+  ("Incorrect number of bindings supplied. The current statement uses 1, and there are 0 supplied").
+  The tests assert the module's documented contract (120 s window, 150 km haversine radius,
+  nearest cross-source candidate). Fix: pass (source,) to conn.execute. Not fixed here —
+  backend/collectors is owned by the backend team.
+
+Notes:
+- FastAPI 0.142.x registers include_router() targets lazily (_IncludedRouter); route-table
+  introspection does not list /v1/* paths, so test_api_contract.py verifies via real
+  TestClient GETs (all 15 contract paths return 200).
+- One earlier full-suite run showed test_ml_leakage.py::test_cheating_feature_rejected
+  failing; it passes in isolation and in all subsequent full runs (3x). Attributed to
+  mid-landing file churn while the ML team was writing files, not a code defect.
+- Integration behavior (Sheets/Drive env-gating, not_configured health, lazy imports,
+  mocked writes/uploads) is verified by test_sheets.py + test_drive.py — no real
+  credentials were used or needed.
