@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AETHER Earth Intelligence</string>
+    <string name="error_title">Content unavailable</string>
+    <string name="error_missing_assets">The bundled app content (www/index.html) is missing from this build. No data is shown because none is available — this is a packaging issue, not a data issue. Please reinstall a complete build.</string>
+    <string name="error_load_failed">The app content could not be loaded. Check your connection and pull down to retry.</string>
+    <string name="retry">Retry</string>
+    <string name="channel_name">AETHER alerts</string>
+    <string name="channel_desc">Official weather, earthquake and tsunami alert notifications (reserved for future use).</string>
+</resources>
