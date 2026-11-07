@@ -1,0 +1,88 @@
+# AETHER ML Pipeline — VERIFICATION
+Generated: 2026-10-05 (UTC). All numbers below are measured, not estimated.
+
+## 1. Data used
+- REAL data (data/aether.db, written by backend collectors): 672 forecasts
+  (4 models: ecmwf_ifs, gfs_seamless, icon_seamless, jma_seamless;
+   2 locations: Yangon 16.84,96.17 and 16.80,96.10;
+   valid 2026-10-05T00:00Z → 2026-10-11T23:00Z) + 1 observation
+  (Yangon, 2026-10-05T16:15Z, 25.1°C).
+  -> build_dataset() yields 12 REAL forecast→observation pairs
+     (dataset_version ds_48c620978313904b, tolerance 90 min, leakage guards pass).
+  -> 12 < 30 (training minimum) and < 50 (task smoke-test threshold):
+     NO real model trained. Nothing fake was substituted for real metrics.
+- SYNTHETIC smoke fixture (clearly labeled, seed 42):
+  ml/fixtures/synthetic_smoke_weather.json
+  ("SYNTHETIC SMOKE TEST FIXTURE — NOT REAL DATA"), loaded into the
+  SEPARATE scratch DB data/synthetic_smoke.db (real data/aether.db untouched):
+  2 locations × 2 models × 30 days hourly = 2,880 forecasts, 1,440 observations
+  -> 2,880 pairs, dataset_version ds_26edb16b78515e78.
+
+## 2. Training runs (all on SYNTHETIC data; notes say so; none deployed/champion)
+| task | version | n_train/n_val | validation metric |
+| temperature | weather_temperature_v2026_10_05_001 | 2304/576 | MAE 0.485 °C, RMSE 0.614, CRPS 0.346 |
+| rain_prob | weather_rain_prob_v2026_10_05_001 | 2304/576 | Brier 0.0184, ECE 0.0000 |
+| precip_amount | weather_precip_amount_v2026_10_05_001 | 2304/576 | MAE 0.335 mm, RMSE 0.910, CRPS 0.392 |
+| wind | weather_wind_v2026_10_05_001 | 2304/576 | MAE 0.702 m/s, RMSE 0.881, CRPS 0.498 |
+| pressure | weather_pressure_v2026_10_05_001 | 2304/576 | MAE 0.938 hPa, RMSE 1.165, CRPS 0.658 |
+| humidity | weather_humidity_v2026_10_05_001 | 2304/576 | MAE 3.211 %, RMSE 4.110, CRPS 2.291 |
+Location handling: per-location models (each location had 1440 rows >= 200).
+Deploy gate: all 6 REJECTED with reason "synthetic smoke-test model is never
+deployed and never marked champion". Champions in DB: 0. training_runs: 6 rows,
+all status=success, deployed=0, notes="synthetic smoke test — not a real model…".
+model_scores rows written: 48 (overall + per-horizon + per-location + per-regime).
+Artifacts: models/<version>/{artifact.joblib, manifest.json, MODEL_CARD.md} × 6.
+
+## 3. Calibration (rain_prob, synthetic validation)
+Per-regime Isotonic vs Platt, best validation Brier kept:
+clear: isotonic 0.00365→0.00212 (n=394); tropical_convection: isotonic
+0.09676→0.07850 (n=112); monsoon: isotonic 0.01722→0.01675 (n=58);
+heavy_rain: none — too few samples (n=12), uncalibrated used (honest fallback);
+thunderstorm: none (n=0).
+
+## 4. Walk-forward backtest (synthetic; "pretend it's date X, only data ≤ X")
+temperature, cutoffs 2026-09-12/19/26, 7-day steps:
+  fold0: n_train=676,  n_eval=676, MAE 0.5031, RMSE 0.6310, CRPS 0.3561
+  fold1: n_train=1348, n_eval=676, MAE 0.4672, RMSE 0.5862, CRPS 0.3308
+  fold2: n_train=2020, n_eval=676, MAE 0.4615, RMSE 0.5818, CRPS 0.3277
+rain_prob:
+  fold0: Brier 0.0427, ECE 0.0423
+  fold1: Brier 0.0246, ECE 0.0177
+  fold2: Brier 0.0247, ECE 0.0185
+Eval windows are strictly after each training cutoff; non-overlapping.
+
+## 5. Leakage controls verified
+- Pair guard: observation later than valid_time+90min is dropped (test).
+- Feature-name guard: future/actual/observed/revision substrings rejected (test).
+- Time split by timestamp value (ties across models/locations handled);
+  max(train) < min(val) asserted; a real mid-tie violation was caught during
+  development and fixed (see report).
+- Seismic module: kind=RISK, is_prediction=False; 0 events in scratch DB
+  handled gracefully (no crash, honest empty stats).
+
+## 6. Tests
+pytest tests/test_ml_leakage.py tests/test_ml_timeseries.py
+       tests/test_ml_registry.py tests/test_ml_honesty.py
+Result: 28 passed, 0 failed (includes 3 leakage guards, tie-split regression
+test, walk-forward non-overlap, metric sanity, deploy-gate rules incl.
+synthetic-never-deploys, forbidden-phrase scan of ml/ + backend/ml_support/).
+
+## 7. Blocked / pending (honest)
+- REAL model training: blocked on observations. Need ≥30 pairs to train
+  (have 12 from 1 observation) and ideally ≥50+ for a meaningful model.
+  The observation collector must run on schedule; each new hourly observation
+  adds ~4-8 pairs. Nothing is faked in the meantime.
+- Champion/deployed model: none exists yet by design (only synthetic runs).
+  First real training + deploy-gate decision happens once real pairs ≥50.
+- regime labels are documented heuristic buckets (no weather_code in schema);
+  revisit if backend adds a weather_code column.
+
+## 8. Notes for other teams
+- backend collectors write model id "gfs_seamless" but schema comment lists
+  "gfs". ML maps unknown model ids to a model_other feature (never silent);
+  suggest backend team align on one id or update schema comment.
+- data/aether.db was created from backend/db/schema.sql (tables only);
+  backend team's init_db.py remains the owner — IF NOT EXISTS makes this safe.
+- Other teams' failing tests (test_alerts, test_api_contract, test_dedup,
+  test_honesty) are theirs; ML suite is green. Their test_honesty flags its
+  own HONESTY.md ban-list — naive grep, not an ML issue.
