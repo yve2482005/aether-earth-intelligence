@@ -1,0 +1,109 @@
+# AETHER source registry — EXAMPLE. Copy to config/sources.yaml and edit.
+# Every source: official URL, endpoint, variables, coverage, update frequency,
+# auth, quota, license, attribution, commercial-use status. Unverified sources
+# stay enabled: false (status pending_verification) until checked live.
+sources:
+  - id: open-meteo-forecast
+    provider: Open-Meteo
+    endpoint: https://api.open-meteo.com/v1/forecast
+    category: weather
+    coverage: global
+    variables: [temperature, humidity, pressure, wind, precipitation, precipitation_probability, cloud_cover, uv]
+    update_frequency: hourly
+    authentication: none
+    rate_limit: "10000 requests/day per IP (free tier)"
+    license: CC BY 4.0 (data); models ECMWF IFS / GFS / ICON / JMA retain their terms
+    attribution: "Weather data by Open-Meteo.com"
+    commercial_use: allowed with attribution
+    expected_freshness_seconds: 3600
+    enabled: true
+
+  - id: open-meteo-air-quality
+    provider: Open-Meteo (CAMS)
+    endpoint: https://air-quality-api.open-meteo.com/v1/air-quality
+    category: air_quality
+    coverage: global
+    variables: [us_aqi, pm2_5, pm10, ozone, nitrogen_dioxide, sulphur_dioxide, carbon_monoxide]
+    update_frequency: hourly
+    authentication: none
+    rate_limit: "10000 requests/day per IP (free tier)"
+    license: CC BY 4.0
+    attribution: "Air quality data by Open-Meteo.com (CAMS)"
+    commercial_use: allowed with attribution
+    expected_freshness_seconds: 3600
+    enabled: true
+
+  - id: usgs-earthquake
+    provider: USGS
+    endpoint: https://earthquake.usgs.gov/fdsnws/event/1/query
+    category: earthquake
+    coverage: global
+    variables: [magnitude, depth, latitude, longitude, origin_time, region, tsunami_flag]
+    update_frequency: 5 minutes (plus M>=4.5 past-24h catch-up)
+    authentication: none
+    rate_limit: none documented (be polite; cache aggressively)
+    license: public domain (USGS)
+    attribution: "Earthquake data: U.S. Geological Survey"
+    commercial_use: allowed
+    expected_freshness_seconds: 300
+    enabled: true
+
+  - id: ptwc-tsunami
+    provider: PTWC (NOAA / UNESCO-IOC)
+    endpoint: https://www.tsunami.gov/events/xml/PHEBAtom.xml
+    category: tsunami
+    coverage: Pacific (global products via PTWC)
+    variables: [official message text, status, issue time, affected areas]
+    update_frequency: on event
+    authentication: none
+    rate_limit: none documented
+    license: public domain (US government)
+    attribution: "Tsunami messages: Pacific Tsunami Warning Center"
+    commercial_use: allowed
+    expected_freshness_seconds: 300
+    enabled: true
+
+  - id: gdacs-disasters
+    provider: GDACS (EU JRC / UN OCHA)
+    endpoint: https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH
+    category: disaster
+    coverage: global
+    variables: [earthquake, tropical cyclone, flood, wildfire, drought, volcano events; severity, population affected]
+    update_frequency: on event (RSS also available)
+    authentication: none
+    rate_limit: none documented (be polite)
+    license: see https://www.gdacs.org/terms (free access; check commercial terms)
+    attribution: "Disaster data: GDACS"
+    commercial_use: check terms before commercial use
+    expected_freshness_seconds: 3600
+    enabled: true
+
+  - id: nasa-firms
+    provider: NASA FIRMS
+    endpoint: https://firms.modaps.eosdis.nasa.gov/api/area/csv/{MAP_KEY}/VIIRS_SNPP_NRT
+    category: wildfire
+    coverage: global
+    variables: [fire detection latitude, longitude, time, confidence, brightness]
+    update_frequency: near real-time (VIIRS ~3h)
+    authentication: free MAP_KEY (register at https://firms.modaps.eosdis.nasa.gov/api/area/)
+    rate_limit: per-key quotas apply
+    license: NASA open data; a hotspot is a detection, not a confirmed wildfire
+    attribution: "Fire data: NASA FIRMS"
+    commercial_use: check NASA terms
+    expected_freshness_seconds: 10800
+    enabled: false  # needs FIRMS_MAP_KEY; status pending_verification until a key is set
+
+  - id: ibtracs-cyclones
+    provider: NOAA NCEI IBTrACS
+    endpoint: https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/csv/
+    category: cyclone_history
+    coverage: global (historical best tracks)
+    variables: [storm position, wind, pressure, basin, name]
+    update_frequency: historical archive (manual backfill, not hourly)
+    authentication: none
+    rate_limit: none documented
+    license: public domain (NOAA)
+    attribution: "Cyclone tracks: NOAA IBTrACS"
+    commercial_use: allowed
+    expected_freshness_seconds: 86400
+    enabled: false  # historical backfill only; run scripts/backfill_ibtracs.py manually

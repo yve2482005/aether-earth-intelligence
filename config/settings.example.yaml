@@ -1,0 +1,31 @@
+# AETHER global settings — EXAMPLE. Copy to config/settings.yaml and edit.
+timezone: UTC
+database:
+  path: data/aether.db
+  busy_timeout_ms: 120000
+collection:
+  locations_total: 1006
+  tier_a_collect_every_hours: 1
+  tier_b_collect_every_hours: 6
+  fanout_per_run: 80
+  fanout_tier_b_share: 20
+  workers: 2
+  run_timeout_seconds: 1200
+quotas:
+  open_meteo_daily_requests_per_ip: 10000
+  sheets_write_requests_per_minute: 60
+sheets:
+  row_guard_per_tab: 45000
+  stage_timeout_seconds: 3300
+train_cycle:
+  threshold_bytes: 1073741824  # 1 GiB raw growth triggers a cycle
+  min_pairs: 100000
+  stage_timeout_seconds: 12600
+api:
+  host: 127.0.0.1
+  port: 8000
+honesty:
+  never_claim_accuracy_percent: true
+  never_predict_earthquakes: true
+  never_infer_tsunami_from_magnitude: true
+  stale_labels_required: true
