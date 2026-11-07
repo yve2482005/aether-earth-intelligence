@@ -1,0 +1,117 @@
+/* ============================================================
+   AETHER Earth Intelligence — DESIGN TOKENS (v2 redesign)
+   Dark-mode-first. Light remains as a secondary theme.
+   ONE accent: Electric Cyan / Atmospheric Blue.
+   Hazard semantics: color + icon + label, never color alone.
+   ============================================================ */
+
+:root{
+  /* ---- surfaces (dark-first default) ---- */
+  --bg:            #070A0F;  /* app background            */
+  --bg-surface:    #0D121A;  /* cards / sheets            */
+  --bg-elev:       #121923;  /* elevated: nav, header     */
+  --bg-soft:       #18212E;  /* chips, wells, stat cards  */
+  --glass:         rgba(255,255,255,.05);
+  --glass-strong:  rgba(255,255,255,.08);
+  --border:        rgba(255,255,255,.10);
+  --border-strong: rgba(255,255,255,.18);
+
+  /* ---- text ---- */
+  --ink:      #F5F7FA;  /* primary   */
+  --ink-2:    #A7B0BE;  /* secondary */
+  --ink-3:    #687384;  /* tertiary / metadata */
+
+  /* ---- the one accent: electric cyan / atmospheric blue ---- */
+  --accent:       #2FD4FF;
+  --accent-deep:  #0E9FD8;
+  --accent-soft:  rgba(47,212,255,.12);
+  --accent-glow:  rgba(47,212,255,.35);
+  --accent-ink:   #04222E;  /* text on accent fills */
+
+  /* ---- hazard semantics (fixed) ---- */
+  --sev-info:     #4AA8FF;  /* information: blue  */
+  --sev-watch:    #FFB020;  /* watch: amber       */
+  --sev-advisory: #FF7A1A;  /* advisory: orange   */
+  --sev-warning:  #FF453A;  /* warning: red       */
+  --sev-life:     #FF1F3D;  /* life safety: strong red */
+  --ok:           #2FD08C;  /* success: green     */
+
+  /* ---- data-kind tags ---- */
+  --kind-forecast:   #A78BFA;
+  --kind-detection:  #2DD4BF;
+  --kind-observation: #34D399;
+  --kind-warning:    #FFB020;
+  --kind-risk:       #FB7185;
+
+  /* ---- typography ---- */
+  --font-sans: "Inter","SF Pro Text",system-ui,-apple-system,"Segoe UI",
+               "Noto Sans Myanmar","Myanmar3","Padauk","Noto Sans JP",sans-serif;
+  --font-mono: "SF Mono","JetBrains Mono","Roboto Mono",ui-monospace,Menlo,Consolas,monospace;
+
+  --fs-display: clamp(3.4rem, 16vw, 4.6rem);  /* hero temperature   */
+  --fs-h1: 1.22rem;   /* screen titles        */
+  --fs-h2: 1.06rem;   /* card titles          */
+  --fs-h3: .94rem;    /* section headings     */
+  --fs-body: .94rem;
+  --fs-small: .82rem;
+  --fs-meta: .72rem;  /* provenance, captions */
+  --fw-regular: 400; --fw-medium: 600; --fw-bold: 700; --fw-display: 800;
+
+  /* ---- shape & depth ---- */
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-pill: 999px;
+  --shadow-card: 0 2px 14px rgba(0,0,0,.45);
+  --shadow-pop:  0 10px 40px rgba(0,0,0,.55);
+  --glow-accent: 0 0 18px var(--accent-glow);
+
+  /* ---- layout ---- */
+  --tabbar-h: 68px;
+  --header-h: 104px;
+  --content-max: 920px;
+  --gap: 14px;
+
+  /* ---- motion (battery-conscious; JS-free) ---- */
+  --dur-fast: .15s; --dur-med: .28s;
+  --ease: cubic-bezier(.22,.8,.3,1);
+
+  color-scheme: dark;
+}
+
+/* JS applies body.dark when the stored theme is dark — identical tokens. */
+body.dark{ color-scheme: dark; }
+
+/* ---- secondary light theme (wired when settings workstream flips
+      the theme default; tokens kept in sync with v1 light values) ---- */
+body.light{
+  --bg:#F2F6FA; --bg-surface:#FFFFFF; --bg-elev:#FFFFFF; --bg-soft:#E9EFF5;
+  --glass:rgba(10,40,70,.04); --glass-strong:rgba(10,40,70,.07);
+  --border:rgba(10,40,70,.12); --border-strong:rgba(10,40,70,.22);
+  --ink:#12242F; --ink-2:#43586A; --ink-3:#6B8194;
+  --accent:#0B7FC4; --accent-deep:#0B5FA5; --accent-soft:rgba(11,127,196,.10);
+  --accent-glow:rgba(11,127,196,.25); --accent-ink:#FFFFFF;
+  --sev-info:#1D4ED8; --sev-watch:#B45309; --sev-advisory:#C2410C;
+  --sev-warning:#DC2626; --sev-life:#B91C1C; --ok:#15803D;
+  --kind-forecast:#6D28D9; --kind-detection:#0E7490; --kind-observation:#166534;
+  --kind-warning:#B45309; --kind-risk:#9A3412;
+  --shadow-card:0 1px 4px rgba(10,40,70,.12);
+  --shadow-pop:0 8px 30px rgba(10,40,70,.25);
+  color-scheme: light;
+}
+
+/* ---- high contrast (user preference; works over both themes) ---- */
+body.hc{
+  --border:var(--ink); --border-strong:var(--ink);
+  --ink-2:var(--ink); --ink-3:var(--ink);
+  --glass:transparent; --glass-strong:transparent;
+  --accent:#66CCFF; --accent-ink:#000;
+}
+body.hc.light{ --accent:#0033CC; --accent-ink:#fff; }
+body.hc.dark{ --bg:#000; --bg-surface:#0A0A0A; --bg-elev:#0A0A0A; --bg-soft:#161616; }
+
+/* ---- reduced motion: honor the OS, always ---- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+}
+/* safety mode also kills decorative motion (JS toggles body.safety-mode) */
+body.safety-mode *, body.safety-mode *::before, body.safety-mode *::after{
+  animation:none !important; transition:none !important;
+}

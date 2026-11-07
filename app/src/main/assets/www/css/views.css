@@ -1,0 +1,174 @@
+/* ============================================================
+   AETHER — VIEW STYLES (v2)
+   Screen-level composition on top of tokens + components.
+   ============================================================ */
+
+/* ---------- HOME: atmospheric hero (the conditions card) ---------- */
+#view-home .card:has(.big-temp){
+  border:1px solid rgba(47,212,255,.28);
+  background:
+    radial-gradient(130% 90% at 50% -20%, rgba(47,212,255,.16), transparent 55%),
+    radial-gradient(80% 60% at 90% 110%, rgba(74,80,255,.10), transparent 60%),
+    linear-gradient(180deg, #0C1622, #070A0F 78%);
+  box-shadow:var(--shadow-card), 0 0 60px rgba(47,212,255,.08), inset 0 1px 0 rgba(255,255,255,.08);
+  overflow:hidden;
+}
+#view-home .card:has(.big-temp)::after{
+  /* faint horizon glow line — pure CSS, battery-conscious */
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent) 30%,var(--accent) 70%,transparent);
+  opacity:.55;
+}
+#view-home .card:has(.big-temp) .stat{
+  background:rgba(255,255,255,.055);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border-color:rgba(255,255,255,.12);
+}
+#view-home .card:has(.big-temp) > h2{
+  font-size:var(--fs-meta);text-transform:uppercase;letter-spacing:.14em;color:var(--ink-3);
+  font-weight:var(--fw-bold);
+}
+#view-home .card:has(.big-temp) h3{color:var(--ink);font-size:var(--fs-h2)}
+#view-home .card:has(.big-temp) p strong{font-size:1.05rem}
+
+/* ---------- HOME: hourly timeline (horizontal, snap) ---------- */
+#view-home .card:not(:has(.big-temp)):has(.kind-forecast) .grid3{
+  display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:4px 2px 10px;margin:0 -4px;scrollbar-width:thin;scrollbar-color:var(--border-strong) transparent;
+}
+#view-home .card:not(:has(.big-temp)):has(.kind-forecast) .grid3 .stat{
+  flex:0 0 112px;scroll-snap-align:start;position:relative;
+}
+#view-home .card:not(:has(.big-temp)):has(.kind-forecast) .grid3 .stat .k{
+  font-family:var(--font-mono);color:var(--accent);font-weight:var(--fw-bold);
+}
+#view-home .card:not(:has(.big-temp)):has(.kind-forecast) .grid3 .stat .v{font-size:1.1rem}
+/* daily rows */
+#view-home dl.facts dt{font-family:var(--font-mono);color:var(--ink-2)}
+#view-home dl.facts dd{font-weight:var(--fw-bold)}
+
+/* ---------- MAP as centerpiece ---------- */
+#view-map .card{
+  padding:14px;
+}
+#view-map .card > h2{
+  display:flex;align-items:center;gap:10px;
+}
+#view-map .card > h2::before{
+  content:"";width:22px;height:22px;flex:none;
+  background:var(--accent);
+  -webkit-mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4Z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg>') center/contain no-repeat;
+  mask:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4Z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg>') center/contain no-repeat;
+}
+#view-map #map{box-shadow:inset 0 0 0 1px rgba(47,212,255,.12), 0 8px 40px rgba(0,0,0,.5)}
+#view-map .legend{border-radius:var(--r-lg)}
+@media (min-width:860px){
+  #view-map #map{height:70vh}
+}
+
+/* ---------- EARTH NOW: timeline emphasis ---------- */
+#view-earthnow .card > h2{
+  display:flex;align-items:center;gap:10px;
+}
+#view-earthnow h3{
+  font-size:var(--fs-meta);text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);
+  margin:18px 0 4px;display:flex;align-items:center;gap:8px;
+}
+
+/* ---------- TSUNAMI: safety-first ---------- */
+#view-tsunami .card:first-child{border-top:3px solid var(--sev-info)}
+#view-tsunami .alert.sev-info{border-color:rgba(74,168,255,.4)}
+#view-tsunami .timeline li::before{border-color:var(--sev-info);box-shadow:0 0 10px rgba(74,168,255,.4)}
+
+/* ---------- ALERTS ---------- */
+#view-alerts .card > h2{
+  display:flex;align-items:center;gap:10px;
+}
+
+/* ---------- ACCURACY ---------- */
+#view-accuracy .card > h2{margin-bottom:2px}
+
+/* ---------- SETTINGS ---------- */
+#view-settings .card > h2{margin-bottom:6px}
+#view-settings .note{margin-top:14px}
+#health-line{font-size:var(--fs-small);color:var(--ink-2);margin:8px 0}
+#cache-msg{font-size:var(--fs-small);color:var(--ok);margin:6px 0 0;min-height:1.2em}
+
+/* ---------- onboarding (3 screens + location step) ---------- */
+.onboarding{
+  position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(47,212,255,.10), transparent 60%),
+    rgba(4,7,11,.86);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+}
+.onboarding[hidden]{display:none}
+.ob-card{
+  background:linear-gradient(180deg, var(--bg-elev), var(--bg-surface));
+  border:1px solid var(--border-strong);border-radius:26px;
+  max-width:400px;width:100%;padding:28px 24px;color:var(--ink);
+  box-shadow:var(--shadow-pop), 0 0 80px rgba(47,212,255,.07);
+  text-align:center;position:relative;overflow:hidden;
+}
+.ob-card::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:120px;pointer-events:none;
+  background:radial-gradient(70% 100% at 50% 0%, rgba(47,212,255,.14), transparent 70%);
+}
+.ob-art{width:120px;height:120px;margin:2px auto 16px;position:relative;color:var(--accent)}
+.ob-art svg{width:100%;height:100%;filter:drop-shadow(0 0 18px var(--accent-glow))}
+.ob-art::after{content:"";position:absolute;inset:-14px;border-radius:50%;
+  border:1px dashed rgba(47,212,255,.35);animation:spin 26s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ob-card h2{margin:0 0 10px;font-size:1.35rem;font-weight:var(--fw-display);letter-spacing:.01em;position:relative}
+.ob-card p{margin:0;color:var(--ink-2);font-size:var(--fs-small);line-height:1.75;position:relative}
+.ob-dots{display:flex;gap:8px;margin:20px 0 4px;justify-content:center}
+.ob-dots i{width:8px;height:8px;border-radius:50%;background:var(--border-strong);transition:all var(--dur-fast)}
+.ob-dots i.on{background:var(--accent);width:26px;border-radius:5px;box-shadow:var(--glow-accent)}
+.ob-actions{display:flex;gap:8px;margin-top:20px;align-items:center;position:relative}
+.ob-spacer{flex:1}
+.ob-loc-hint{
+  margin-top:16px;padding:10px 12px;border-radius:12px;font-size:var(--fs-meta);color:var(--ink-3);
+  background:var(--glass);border:1px dashed var(--border);display:flex;gap:8px;align-items:flex-start;text-align:left;
+}
+.ob-loc-hint svg{width:16px;height:16px;flex:none;color:var(--accent);margin-top:2px}
+
+/* ---------- footer ---------- */
+.app-footer{max-width:var(--content-max);margin:26px auto 0;padding:16px;font-size:var(--fs-meta);
+  color:var(--ink-3);text-align:center;line-height:1.8}
+.app-footer p{margin:4px 0}
+.honesty-note{font-style:italic;opacity:.9}
+
+/* ---------- responsive ---------- */
+
+/* small phones: tighten */
+@media (max-width:360px){
+  .card{padding:14px;border-radius:18px}
+  .brand-text .tagline{display:none}
+  .hdr-cluster .icon-btn{width:34px;height:34px}
+  dl.facts{grid-template-columns:minmax(96px,auto) 1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+  #view-home .card:not(:has(.big-temp)):has(.kind-forecast) .grid3 .stat{flex-basis:104px}
+}
+
+/* tablet / desktop: adaptive left rail */
+@media (min-width:860px){
+  body{padding-bottom:0;padding-left:96px}
+  .tabbar{
+    top:0;bottom:0;left:0;right:auto;width:96px;
+    border-top:none;border-right:1px solid var(--border);
+    padding:14px 0;
+  }
+  .tabbar [role="tablist"]{flex-direction:column;overflow-y:auto;overflow-x:hidden;height:100%;gap:2px}
+  .tabbar [role="tab"]{min-width:0;padding:12px 6px;font-size:10px;gap:6px}
+  .tabbar [role="tab"] .tab-icon{width:24px;height:24px}
+  .tabbar [role="tab"]::after{left:auto;right:0;top:24%;bottom:24%;width:3px;height:auto}
+  main{max-width:1060px;padding:22px 26px}
+  .app-header{padding-left:26px;padding-right:26px}
+  .banner,.safety-pinned{padding-left:26px;padding-right:26px}
+}
+
+/* wide desktop: roomier dashboard grid */
+@media (min-width:1280px){
+  main{max-width:1180px}
+  #view-home .card:has(.big-temp) .grid3{grid-template-columns:repeat(6,1fr)}
+}
