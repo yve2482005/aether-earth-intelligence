@@ -1,0 +1,21 @@
+# AETHER data + credentials — never commit these.
+data/
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+*.db.gz
+.sheets_snapshot_*.db
+bootstrap/SHEETS_ARCHIVE_STATE.json
+bootstrap/SHEETS_ARCHIVE_STATE.json.bak*
+.env
+*.keystore
+*.pem
+*.key
+__pycache__/
+*.pyc
+models/
+training_logs/
+app/build/
+web/node_modules/
+.DS_Store

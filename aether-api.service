@@ -1,0 +1,13 @@
+[Unit]
+Description=AETHER Earth Intelligence API (incl. /v1/datamgmt advanced data management)
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/home/hatch/workspace/aether-earth-intelligence
+ExecStart=/home/hatch/workspace/.tooling/aether-venv/bin/python scripts/run_api.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

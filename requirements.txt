@@ -1,0 +1,13 @@
+# AETHER Earth Intelligence — Python dependencies (all free / zero spend)
+requests>=2.31
+fastapi>=0.110
+uvicorn[standard]>=0.29
+scikit-learn>=1.4
+numpy>=1.26
+joblib>=1.3
+gspread>=6.0
+google-api-python-client>=2.120
+google-auth>=2.27
+h3>=4.0
+httpx>=0.27
+pytest>=8.0
