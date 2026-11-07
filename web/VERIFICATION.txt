@@ -1,0 +1,67 @@
+AETHER Web PWA — VERIFICATION
+Generated: 2026-10-05 (build by Web workstream)
+Root: ~/workspace/aether-earth-intelligence/
+
+FILES (21 total)
+  web/index.html                  app shell: 8 tabs, onboarding overlay, safety toggle, header controls
+  web/manifest.json               PWA manifest (my default, standalone, 4 icons)
+  web/sw.js                       service worker: cache-first shell, network-first /v1/* + cache fallback, offline.html fallback
+  web/offline.html                offline fallback page (Burmese)
+  web/css/tokens.css              design tokens: dark-first palette, accent, hazard semantics, type scale (v2)
+  web/css/components.css          component library: buttons, cards, badges, banners, sheets, states (v2)
+  web/css/views.css               view composition: hero, hourly timeline, rails, onboarding, map (v2)
+  web/js/i18n.js                  flat-key loader, my default, fallback chain
+  web/js/gazetteer.js             offline gazetteer, 41 cities
+  web/js/app.js                   router, API client (10s timeout), localStorage cache, locations, banner, safety
+  web/js/home.js                  dashboard: conditions (OBSERVATION), hourly/daily (FORECAST), confidence+reasons, model strip
+  web/js/earthnow.js              unified /v1/events timeline with kind tags, near-you section
+  web/js/mapview.js               Leaflet: weather markers, quake clusters (size=mag, color=depth/age),
+                                  tsunami zones w/ source+issue+update, legend, search, theme toggle, forecast-hour slider
+  web/js/earthquakes.js           list+detail cards (mag/depth/distance/local+UTC/felt/tsunami/source/confidence+reasons)
+  web/js/tsunami.js               official status per saved location, raw_classification preserved, arrival-unavailable state
+  web/js/alerts.js                unified center, severity filters, quiet hours, dedup note, life-safety-first ordering,
+                                  renderPinned() for Safety Mode
+  web/js/accuracy.js              MAE/RMSE/Brier/CRPS/calibration tables, canvas forecast-vs-observed charts, prob≠accuracy note
+  web/js/settings.js              language/units/notifications/safety/saved places/cache/about+sources
+  web/i18n/my.json                164 keys (default)
+  web/i18n/en.json                164 keys
+  web/i18n/ja.json                164 keys
+  web/icons/icon.svg, icon-192.png, icon-512.png   (PNGs generated stdlib-only, valid signatures)
+  gis/geojson.py                  point/polygon/feature_collection/bbox_of/write_geojson/quake_feature
+
+CHECKS PASSED
+  [1] node --check: 12/12 pass (11 js/*.js + sw.js)
+  [2] i18n JSON parse: 3/3 valid; key counts my=164 en=164 ja=164; cross-language parity 100%
+  [3] i18n key audit: 132 static keys referenced in JS/HTML, 0 undefined
+        (dynamic families verified complete: tsunami.cat.* x5, kind.* x5, alerts.sev.* x3, onboarding.s1-3)
+  [4] Forbidden phrases grep ("100% accurate"|"guaranteed"|"will occur", case-insensitive): 0 matches in web/ and gis/
+  [5] index.html asset references: 16/16 resolve to files on disk (CDN links excluded)
+  [6] sw.js APP_SHELL: 22 entries, 0 missing on disk
+  [7] python3 -m http.server serve test: 10/10 paths returned HTTP 200
+        (index.html, manifest.json, sw.js, offline.html, css/tokens.css, js/app.js,
+         js/mapview.js, i18n/my.json, icons/icon-192.png, icons/icon-512.png)
+  [8] PNG icons: valid PNG signatures (192 + 512)
+  [9] gis/geojson.py smoke: 2 features, bbox [95.0, 15.0, 97.0, 17.0] correct
+  [10] Bugs found & fixed during verification:
+        - js/home.js line 69: extra paren (SyntaxError) — fixed, re-checked
+        - js/mapview.js: t('tsunami.source') undefined key — fixed to t('common.source')
+        - js/mapview.js: Leaflet instance reused on detached DOM on tab re-visit — fixed (map.remove() on re-render)
+        - js/gazetteer.js: Istanbul country typo — fixed
+
+HONESTY PROPERTIES (by construction)
+  - Every fetch: 10s timeout -> last-good localStorage payload + staleness banner
+    ("Updated X min ago — connection unavailable"), else honest unavailable state.
+  - No number is rendered unless it came from /v1 or cache; missing -> "—" or unavailable card.
+  - Every data section carries a kind tag (FORECAST/DETECTION/OBSERVATION/WARNING/RISK).
+  - No earthquake prediction UI. Tsunami = official messages only, raw_classification preserved verbatim.
+  - Official categories (WARNING/ADVISORY/WATCH/INFORMATION/NO THREAT) shown in original
+    English + localized explanation side by side.
+
+KNOWN LIMITS / NOT VERIFIED HERE
+  - Backend /v1 API not present yet (backend/ empty at build time): all views coded
+    defensively and verified against the CONTRACTS.md contract; live-data rendering
+    awaits the backend team's endpoints.
+  - Leaflet/markercluster load from CDN at runtime (zero-build rule); first offline
+    visit needs a prior online load. Honest fallback shown when unavailable.
+  - No real-device/browser test performed (no browser tool in this environment);
+    DOM behavior verified by code review + syntax checks only.

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=no">
+<title>AETHER Operations</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/views.css">
+<style>
+  .ops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+  .health{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.85em;font-weight:600}
+  .health-healthy{background:#dcfce7;color:#166534}
+  .health-degraded{background:#fef9c3;color:#854d0e}
+  .health-stale{background:#ffedd5;color:#9a3412}
+  .health-failed{background:#fee2e2;color:#991b1b}
+  .health-disabled{background:#f3f4f6;color:#4b5563}
+  .ops-form{display:grid;gap:8px;max-width:420px}
+  .ops-form input,.ops-form select,.ops-form textarea{padding:8px;border:1px solid #ccc;border-radius:6px;font:inherit}
+  .tl{list-style:none;padding:0}
+  .tl li{border-left:3px solid #0b5fa5;padding:4px 0 4px 10px;margin:6px 0}
+  .inc-open{border-left:4px solid #b91c1c}
+  .inc-investigating{border-left:4px solid #b45309}
+  .inc-resolved{border-left:4px solid #166534;opacity:.85}
+  details.ops{margin:8px 0}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">🛠️</span>
+    <div class="brand-text">
+      <h1 data-i18n="adm.title">Operations</h1>
+      <p class="tagline"><span data-i18n="adm.as_of">As of</span> <span id="ops-asof">—</span></p>
+    </div>
+  </div>
+  <div class="header-controls">
+    <button type="button" class="btn btn-small" id="ops-refresh" data-i18n="adm.refresh">Refresh</button>
+    <a class="btn btn-small btn-ghost" href="index.html">AETHER</a>
+  </div>
+</header>
+
+<main id="main" class="ops-grid" style="padding:12px">
+  <section class="card" id="ops-sources"><h2 data-i18n="adm.sources">Sources</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-freshness"><h2 data-i18n="adm.freshness">Data freshness</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-hazards"><h2 data-i18n="smr.active_hazards">Active hazards</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-alerts"><h2 data-i18n="adm.alert_queue">Alert queue</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-jobs"><h2 data-i18n="adm.failed_jobs">Failed jobs</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-incidents"><h2 data-i18n="adm.incidents">Incidents</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-incident-new"><h2 data-i18n="adm.inc.record">Record incident</h2>
+    <form class="ops-form" id="inc-form">
+      <label><span data-i18n="adm.inc.type">Type</span>
+        <select name="type" id="inc-type"></select></label>
+      <label><span data-i18n="adm.inc.component">Component</span>
+        <input name="component" id="inc-component" required placeholder="collector:open-meteo-forecast"></label>
+      <label><span data-i18n="adm.inc.title_l">Title</span>
+        <input name="title" id="inc-title" required></label>
+      <label><span data-i18n="adm.inc.detail">Detail</span>
+        <textarea name="detail" id="inc-detail" rows="2"></textarea></label>
+      <button type="submit" class="btn btn-primary" data-i18n="adm.inc.record">Record incident</button>
+    </form>
+  </section>
+  <section class="card" id="ops-models"><h2 data-i18n="adm.models">Models</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-accuracy"><h2 data-i18n="adm.accuracy_snapshot">Accuracy snapshot</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-deliveries"><h2 data-i18n="adm.deliveries">Delivery log</h2><div class="skeleton" style="height:120px"></div></section>
+  <section class="card" id="ops-storage"><h2 data-i18n="adm.storage">Storage</h2><div class="skeleton" style="height:120px"></div></section>
+</main>
+
+<script src="js/i18n.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AETHER — Earth Intelligence</title>
+<meta name="description" content="AETHER Earth Intelligence — weather, earthquakes, tsunami and alerts. Honest data, labeled by kind.">
+<meta name="theme-color" content="#070A0F">
+<meta name="color-scheme" content="dark light">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="vendor/leaflet/MarkerCluster.css">
+<link rel="stylesheet" href="vendor/leaflet/MarkerCluster.Default.css">
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/views.css">
+</head>
+<body>
+<a class="skip-link" href="#main" data-i18n="skip.link">Skip to main content</a>
+
+<!-- Onboarding overlay: exactly 3 screens + location-permission step -->
+<div id="onboarding" class="onboarding" role="dialog" aria-modal="true" aria-labelledby="ob-title" hidden>
+  <div class="ob-card">
+    <div class="ob-art" aria-hidden="true">
+      <svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+        <circle cx="60" cy="60" r="34" opacity=".9"/>
+        <path d="M26 60h68" opacity=".55"/>
+        <path d="M60 26c-14 8-14 60 0 68" opacity=".55"/>
+        <path d="M60 26c14 8 14 60 0 68" opacity=".55"/>
+        <path d="M88 30l4-8 4 8M96 22h-8" opacity=".8"/>
+        <circle cx="88" cy="84" r="7" opacity=".8"/>
+        <path d="M88 81v6M85 84h6" opacity=".8"/>
+      </svg>
+    </div>
+    <div class="ob-dots" id="ob-dots" aria-hidden="true"></div>
+    <h2 id="ob-title" data-i18n="onboarding.s1.title"></h2>
+    <p id="ob-desc" data-i18n="onboarding.s1.desc"></p>
+    <div class="ob-loc-hint">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-10.5A6.5 6.5 0 0 1 12 4a6.5 6.5 0 0 1 6.5 6.5C18.5 15.4 12 21 12 21Z"/><circle cx="12" cy="10.5" r="2.3"/></svg>
+      <span data-i18n="dsn.onboarding.loc"></span>
+    </div>
+    <div class="ob-actions">
+      <button type="button" class="btn btn-ghost" id="ob-skip" data-i18n="onboarding.skip"></button>
+      <span class="ob-spacer"></span>
+      <button type="button" class="btn btn-ghost" id="ob-back" data-i18n="onboarding.back" hidden></button>
+      <button type="button" class="btn btn-primary" id="ob-next" data-i18n="onboarding.next"></button>
+    </div>
+  </div>
+</div>
+
+<header class="app-header">
+  <div class="hdr-row">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8"/><path d="M12 3.6c2.8 2.3 4.2 5.2 4.2 8.4s-1.4 6.1-4.2 8.4c-2.8-2.3-4.2-5.2-4.2-8.4S9.2 5.9 12 3.6Z"/></svg>
+      </span>
+      <div class="brand-text">
+        <h1 data-i18n="app.title">AETHER</h1>
+        <p class="tagline" data-i18n="app.tagline"></p>
+      </div>
+    </div>
+    <span class="hdr-spacer"></span>
+    <div class="hdr-cluster" role="group" aria-label="Quick navigation">
+      <button type="button" class="icon-btn" data-i18n-aria="nav.alerts" data-i18n-title="nav.alerts" title="" onclick="AETHER.show('alerts')" aria-label="Alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9.5a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4S6 14.5 6 9.5"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/></svg>
+      </button>
+      <button type="button" class="icon-btn" data-i18n-aria="nav.settings" data-i18n-title="nav.settings" title="" onclick="AETHER.show('settings')" aria-label="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg>
+      </button>
+      <button type="button" id="contrast-toggle" class="icon-btn theme-ic" aria-pressed="false" data-i18n-aria="header.contrast" data-i18n-title="header.contrast" title="">◐</button>
+      <button type="button" id="theme-toggle" class="icon-btn theme-ic" aria-pressed="false" data-i18n-aria="header.theme" data-i18n-title="header.theme" title="">🌙</button>
+    </div>
+  </div>
+  <div class="hdr-sub">
+    <button type="button" class="loc-btn" onclick="AETHER.show('settings')" data-i18n-aria="dsn.header.location" aria-label="Location">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-10.5A6.5 6.5 0 0 1 12 4a6.5 6.5 0 0 1 6.5 6.5C18.5 15.4 12 21 12 21Z"/><circle cx="12" cy="10.5" r="2.3"/></svg>
+      <span data-i18n="dsn.header.location">Location</span>
+    </button>
+    <label class="switch safety-chip safety-switch" title="Safety Mode">
+      <input type="checkbox" id="safety-toggle" aria-describedby="safety-hint">
+      <span class="switch-track" aria-hidden="true"></span>
+      <span class="switch-label" data-i18n="header.safety_mode"></span>
+    </label>
+    <span id="safety-hint" class="visually-hidden" data-i18n="settings.safety.desc"></span>
+  </div>
+</header>
+
+<div id="banner" class="banner" role="status" hidden>
+  <span class="banner-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 22 20H2L12 3.5Z"/><path d="M12 9.5v4.5"/><circle cx="12" cy="16.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+  </span>
+  <span id="banner-text"></span>
+  <button type="button" class="btn btn-small" id="banner-retry" data-i18n="common.retry"></button>
+</div>
+
+<div id="safety-pinned" class="safety-pinned" hidden>
+  <h2>
+    <span class="sp-ic" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 5.8v6c0 4.4 2.9 7.6 7 9.2 4.1-1.6 7-4.8 7-9.2v-6L12 3Z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>
+    </span>
+    <span data-i18n="safety.pinned"></span>
+  </h2>
+  <div id="safety-pinned-list" class="alert-list"></div>
+</div>
+
+<nav class="tabbar" aria-label="Sections">
+  <div role="tablist" aria-label="AETHER sections" id="tablist">
+    <button type="button" role="tab" id="tab-home" aria-controls="view-home" aria-selected="true" data-view="home"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6.5 10.5V20h11v-9.5"/><path d="M10 20v-5h4v5"/></svg></span><span data-i18n="nav.home"></span></button>
+    <button type="button" role="tab" id="tab-earthnow" aria-controls="view-earthnow" aria-selected="false" data-view="earthnow" tabindex="-1"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M3.8 12h16.4"/><path d="M12 3.8c-4.6 2.4-4.6 14 0 16.4"/><path d="M12 3.8c4.6 2.4 4.6 14 0 16.4"/></svg></span><span data-i18n="nav.earthnow"></span></button>
+    <button type="button" role="tab" id="tab-map" aria-controls="view-map" aria-selected="false" data-view="map" tabindex="-1"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6 9 4Z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg></span><span data-i18n="nav.map"></span></button>
+    <button type="button" role="tab" id="tab-quakes" aria-controls="view-quakes" aria-selected="false" data-view="quakes" tabindex="-1"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12h4l2.5-6 3.5 12 2.5-8 1.8 2H21.5"/></svg></span><span data-i18n="nav.quakes"></span></button>
+    <button type="button" role="tab" id="tab-tsunami" aria-controls="view-tsunami" aria-selected="false" data-view="tsunami" tabindex="-1"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9.5c2.5 0 2.5 2.5 5 2.5s2.5-2.5 5-2.5 2.5 2.5 5 2.5 2.5-2.5 4-2.5"/><path d="M2.5 14.5c2.5 0 2.5 2.5 5 2.5s2.5-2.5 5-2.5 2.5 2.5 5 2.5 2.5-2.5 4-2.5"/><path d="M2.5 19.5c2.5 0 2.5 2 5 2s2.5-2 5-2 2.5 2 5 2 2.5-2 4-2" opacity=".45"/></svg></span><span data-i18n="nav.tsunami"></span></button>
+    <button type="button" role="tab" id="tab-alerts" aria-controls="view-alerts" aria-selected="false" data-view="alerts" tabindex="-1"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9.5a6 6 0 0 1 12 0c0 5 2 6.5 2 6.5H4S6 14.5 6 9.5"/><path d="M10 19.5a2.2 2.2 0 0 0 4 0"/></svg></span><span data-i18n="nav.alerts"></span></button>
+    <button type="button" role="tab" id="tab-accuracy" aria-controls="view-accuracy" aria-selected="false" data-view="accuracy" tabindex="-1"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16h16"/><path d="M8 15.5v-5"/><path d="M12.5 15.5v-8"/><path d="M17 15.5V7"/></svg></span><span data-i18n="nav.accuracy"></span></button>
+    <button type="button" role="tab" id="tab-settings" aria-controls="view-settings" aria-selected="false" data-view="settings" tabindex="-1"><span class="tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M18.5 5.5l-2.1 2.1M7.6 16.4l-2.1 2.1"/></svg></span><span data-i18n="nav.settings"></span></button>
+  </div>
+</nav>
+
+<main id="main" tabindex="-1">
+  <section id="view-home" role="tabpanel" aria-labelledby="tab-home" tabindex="0"></section>
+  <section id="view-earthnow" role="tabpanel" aria-labelledby="tab-earthnow" tabindex="0" hidden></section>
+  <section id="view-map" role="tabpanel" aria-labelledby="tab-map" tabindex="0" hidden></section>
+  <section id="view-quakes" role="tabpanel" aria-labelledby="tab-quakes" tabindex="0" hidden></section>
+  <section id="view-tsunami" role="tabpanel" aria-labelledby="tab-tsunami" tabindex="0" hidden></section>
+  <section id="view-alerts" role="tabpanel" aria-labelledby="tab-alerts" tabindex="0" hidden></section>
+  <section id="view-accuracy" role="tabpanel" aria-labelledby="tab-accuracy" tabindex="0" hidden></section>
+  <section id="view-settings" role="tabpanel" aria-labelledby="tab-settings" tabindex="0" hidden></section>
+</main>
+
+<footer class="app-footer">
+  <p><span data-i18n="app.title">AETHER</span> · <span data-i18n="app.version">v1.0.0-web</span></p>
+  <p class="honesty-note" data-i18n="onboarding.s2.desc"></p>
+</footer>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="vendor/leaflet/markercluster.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/gazetteer.js"></script>
+<script src="js/app.js"></script>
+<script src="js/home.js"></script>
+<script src="js/earthnow.js"></script>
+<script src="js/mapview.js"></script>
+<script src="js/earthquakes.js"></script>
+<script src="js/tsunami.js"></script>
+<script src="js/alerts.js"></script>
+<script src="js/accuracy.js"></script>
+<script src="js/settings.js"></script>
+<script>AETHER.boot();</script>
+</body>
+</html>
