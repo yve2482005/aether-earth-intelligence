@@ -1,0 +1,142 @@
+{
+ "pageerrors": [],
+ "flows": {
+  "F1_onboarding_home": {
+   "pass": true,
+   "detail": "overlay_shown=False dismissed_or_n/a=True home_cards=3"
+  },
+  "F2_map_layers": {
+   "pass": true,
+   "detail": "map_init=True layer_labels=5 legend_rows=7 ctrl=<div class=\"map-tools\" id=\"layer-panel\" role=\"group\" aria-label=\"အလွှာများ\"><strong>အလွှာများ:</strong> <label class=\"chip\"><input type=\"checkbox\" data-layer=\"weather\" checked=\"\"> ရာသီဥတု</label> <lab"
+  },
+  "F3_quake_detail": {
+   "pass": true,
+   "detail": "quake_cards=26 provenance_lines=1"
+  },
+  "F4_tsunami": {
+   "pass": true,
+   "detail": "location_status_cards=1 history_items=0 empty_states=1"
+  },
+  "F5_alerts_triage": {
+   "pass": true,
+   "detail": "filters=4 alerts_before=0 after_critical_filter=0"
+  },
+  "F6_accuracy": {
+   "pass": false,
+   "detail": "metric_tables=0 charts=0 prob_note=True empty=0 (no verification data on server: honest note shown)"
+  },
+  "F7_settings": {
+   "pass": true,
+   "detail": "lang=en title=Settings; cache_msg=ကက်ရှ် ရှင်းပြီးပါပြီ; theme_dark True->False->True"
+  }
+ },
+ "viewports": {
+  "320": {
+   "horizontal_overflow": [],
+   "pageerrors": []
+  },
+  "360": {
+   "horizontal_overflow": [],
+   "pageerrors": []
+  },
+  "430": {
+   "horizontal_overflow": [],
+   "pageerrors": []
+  },
+  "768": {
+   "horizontal_overflow": [],
+   "pageerrors": []
+  },
+  "1280": {
+   "horizontal_overflow": [],
+   "pageerrors": []
+  }
+ },
+ "body_dark": true,
+ "leaflet_local": true,
+ "pageerrors_390": [
+  "console-error: An unknown error occurred when fetching the script.",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE",
+  "console-error: Failed to load resource: net::ERR_EMPTY_RESPONSE"
+ ],
+ "flow_errors": [],
+ "bad_urls_390": [
+  "404:https://aether.local/v1/accuracy/baselines?location_id=1&variable=temperature&horizon=24",
+  "404:https://aether.local/v1/accuracy/compare?location_id=1&variable=temperature&horizon=24&model=gfs&window=72",
+  "404:https://aether.local/v1/accuracy/models?location_id=1&variable=temperature&horizon=24",
+  "404:https://aether.local/v1/engines/ocean?lat=16.84&lon=96.17&hours=48",
+  "404:https://aether.local/v1/engines/sunmoon?lat=16.84&lon=96.17",
+  "404:https://aether.local/v1/notify/history?limit=20",
+  "404:https://aether.local/v1/notify/preferences?user_id=local",
+  "404:https://aether.local/v1/notify/travel?user_id=local",
+  "404:https://aether.local/v1/nowcast?lat=16.84&lon=96.17",
+  "404:https://aether.local/v1/replay?date=2026-10-04&location_id=1",
+  "404:https://aether.local/v1/trust/index?location_id=1",
+  "404:https://aether.local/v1/trust/sources",
+  "FAILED:https://a.basemaps.cartocdn.com/dark_all/5/23/13@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://a.basemaps.cartocdn.com/dark_all/5/24/15@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://a.basemaps.cartocdn.com/dark_all/5/25/14@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://b.basemaps.cartocdn.com/dark_all/5/23/14@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://b.basemaps.cartocdn.com/dark_all/5/24/13@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://b.basemaps.cartocdn.com/dark_all/5/25/15@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://c.basemaps.cartocdn.com/dark_all/5/23/15@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://c.basemaps.cartocdn.com/dark_all/5/24/14@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://c.basemaps.cartocdn.com/dark_all/5/25/13@2x.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://tile.openstreetmap.org/5/23/13.png net::ERR_ABORTED",
+  "FAILED:https://tile.openstreetmap.org/5/23/14.png net::ERR_ABORTED",
+  "FAILED:https://tile.openstreetmap.org/5/23/15.png net::ERR_ABORTED",
+  "FAILED:https://tile.openstreetmap.org/5/24/13.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://tile.openstreetmap.org/5/24/14.png net::ERR_EMPTY_RESPONSE",
+  "FAILED:https://tile.openstreetmap.org/5/24/15.png net::ERR_ABORTED",
+  "FAILED:https://tile.openstreetmap.org/5/25/13.png net::ERR_ABORTED",
+  "FAILED:https://tile.openstreetmap.org/5/25/14.png net::ERR_ABORTED",
+  "FAILED:https://tile.openstreetmap.org/5/25/15.png net::ERR_ABORTED"
+ ]
+}
