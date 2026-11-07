@@ -1,0 +1,34 @@
+name: collector
+
+# Scheduled collection. GitHub Actions scheduling is best-effort: do not
+# promise exact minute-level timing or real-time execution.
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aether-collector
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Validate configuration (no fetching yet)
+        run: python main.py --help
+      - name: Run collector (conservative intervals; respects quotas)
+        env:
+          AETHER_SHEETS_ENABLED: "0"
+          AETHER_DRIVE_ENABLED: "0"
+        run: timeout -k 30 1200 python main.py collect

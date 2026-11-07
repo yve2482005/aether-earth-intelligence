@@ -1,0 +1,33 @@
+name: manual-run
+
+# Controlled manual collection run with a clear summary.
+on:
+  workflow_dispatch:
+    inputs:
+      command:
+        description: "Stage to run"
+        required: true
+        default: "collect"
+        type: choice
+        options: [collect, gdacs, sync-sheets, train]
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run selected stage
+        env:
+          AETHER_SHEETS_ENABLED: "0"
+          AETHER_DRIVE_ENABLED: "0"
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+        run: python main.py ${{ inputs.command }}

@@ -1,0 +1,42 @@
+name: evaluate-models
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * 0'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Evaluate ML models (ML team entry point)
+        run: |
+          test -f ml/weather/evaluate.py || { echo "ERROR: ml/weather/evaluate.py not landed yet (ML team)"; exit 1; }
+          python ml/weather/evaluate.py
+          test -f ml/evaluation/backtest.py || { echo "ERROR: ml/evaluation/backtest.py not landed yet (ML team)"; exit 1; }
+          python ml/evaluation/backtest.py
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Full pytest suite
+        run: python -m pytest tests/ -q
+      - name: Leakage tests (required when ML team lands them)
+        run: |
+          if ls tests/test_ml_leakage.py >/dev/null 2>&1; then
+            python -m pytest tests/test_ml_leakage.py -q
+          else
+            echo "ML leakage tests not landed yet (ML team) - skipping"
+          fi

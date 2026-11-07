@@ -1,0 +1,40 @@
+name: train-models
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 0'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Train ML models (ML team entry point)
+        run: |
+          test -f ml/weather/train.py || { echo "ERROR: ml/weather/train.py not landed yet (backend team)"; exit 1; }
+          python ml/weather/train.py
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Full pytest suite
+        run: python -m pytest tests/ -q
+      - name: Leakage tests (required when ML team lands them)
+        run: |
+          if ls tests/test_ml_leakage.py >/dev/null 2>&1; then
+            python -m pytest tests/test_ml_leakage.py -q
+          else
+            echo "ML leakage tests not landed yet (ML team) - skipping"
+          fi

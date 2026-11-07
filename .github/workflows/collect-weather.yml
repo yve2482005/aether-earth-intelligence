@@ -1,0 +1,40 @@
+name: collect-weather
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'   # every 30 minutes, conservative for free-tier APIs
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Collect weather data
+        run: |
+          test -f scripts/run_collect.py || { echo "ERROR: scripts/run_collect.py not landed yet (backend team)"; exit 1; }
+          python scripts/run_collect.py weather
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Full pytest suite
+        run: python -m pytest tests/ -q
+      - name: Leakage tests (required when ML team lands them)
+        run: |
+          if ls tests/test_ml_leakage.py >/dev/null 2>&1; then
+            python -m pytest tests/test_ml_leakage.py -q
+          else
+            echo "ML leakage tests not landed yet (ML team) - skipping"
+          fi

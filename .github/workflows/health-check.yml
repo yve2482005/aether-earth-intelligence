@@ -1,0 +1,42 @@
+name: health-check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Health check
+        run: |
+          test -f data/aether.db || { echo "WARNING: data/aether.db not present yet"; }
+          python -c "import sqlite3, os; p=\"data/aether.db\"; print(\"db_ok\" if os.path.isfile(p) else \"db_missing\")"
+          python -c "from backend.integrations.sheets import SheetMirror; print(SheetMirror().health())"
+          python -c "from backend.integrations.drive import DriveArchive; print(DriveArchive().health())"
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Full pytest suite
+        run: python -m pytest tests/ -q
+      - name: Leakage tests (required when ML team lands them)
+        run: |
+          if ls tests/test_ml_leakage.py >/dev/null 2>&1; then
+            python -m pytest tests/test_ml_leakage.py -q
+          else
+            echo "ML leakage tests not landed yet (ML team) - skipping"
+          fi
